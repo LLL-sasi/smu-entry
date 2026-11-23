@@ -6,7 +6,7 @@
 <title>南医大 AI 学习助手</title>
 <meta name="theme-color" content="#1f6feb">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐋</text></svg>">
-<meta http-equiv="refresh" content="4; url=http://7194cc1b.r60.cpolar.top/">
+
 <style>
   :root { --blue:#1f6feb; --ink:#1f2328; --muted:#6b7683; --line:#e6ecf3; }
   * { box-sizing:border-box; }
@@ -48,7 +48,7 @@
     <p class="sub">课件 → 分级笔记 → 错题 → 复习</p>
     <div class="status" id="status"><span class="dot"></span><span id="statusText">正在检测服务器…</span></div>
 
-    <a class="btn" href="http://7194cc1b.r60.cpolar.top/">立即进入</a>
+    <a class="btn" href="#" id="enterBtn">立即进入</a>
 
     <ul class="steps">
       <li><b>① 注册</b>：用户名随便起，邀请码填 <span class="code">2026LIN</span></li>
@@ -66,30 +66,49 @@
   </div>
 
 <script>
-  (function () {
-    var target = "http://7194cc1b.r60.cpolar.top/_stcore/health";
-    var status = document.getElementById("status");
-    var statusText = document.getElementById("statusText");
-    var warn = document.getElementById("warn");
-    var timer = setTimeout(function () {
-      status.classList.add("off");
-      statusText.textContent = "服务器暂时没响应";
-      warn.style.display = "block";
-    }, 3500);
+  // 依次探测候选域名，跳到第一个能通的（cpolar 重启会换域名，多写几个）
+  var CANDIDATES = [
+    "http://7194cc1b.r60.cpolar.top",
+    "http://4d56101e.r60.cpolar.top"
+  ];
+  var status = document.getElementById("status");
+  var statusText = document.getElementById("statusText");
+  var warn = document.getElementById("warn");
+  var btn = document.getElementById("enterBtn");
+  var online = null;
 
-    fetch(target, { mode: "no-cors", cache: "no-store" })
-      .then(function () {
-        clearTimeout(timer);
+  function probe(base) {
+    return fetch(base + "/_stcore/health", { mode: "no-cors", cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined })
+      .then(function () { return base; })
+      .catch(function () { return null; });
+  }
+
+  function tryAll(index) {
+    if (index >= CANDIDATES.length) {
+      status.classList.add("off");
+      statusText.textContent = "服务器暂时连不上";
+      warn.style.display = "block";
+      btn.onclick = function (e) { e.preventDefault(); tryAll(0); };
+      return;
+    }
+    statusText.textContent = "正在检测服务器…";
+    probe(CANDIDATES[index]).then(function (ok) {
+      if (ok) {
+        online = ok;
         statusText.textContent = "服务器在线，正在进入…";
-        setTimeout(function () { location.href = "http://7194cc1b.r60.cpolar.top/"; }, 900);
-      })
-      .catch(function () {
-        clearTimeout(timer);
-        status.classList.add("off");
-        statusText.textContent = "服务器暂时连不上";
-        warn.style.display = "block";
-      });
-  })();
+        btn.href = ok + "/";
+        setTimeout(function () { location.href = ok + "/"; }, 800);
+      } else {
+        tryAll(index + 1);
+      }
+    });
+  }
+
+  btn.onclick = function (e) {
+    e.preventDefault();
+    if (online) { location.href = online + "/"; } else { tryAll(0); }
+  };
+  tryAll(0);
 </script>
 </body>
 </html>
