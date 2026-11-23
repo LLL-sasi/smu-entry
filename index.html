@@ -62,53 +62,18 @@
       请稍后再试，或者告诉管理员「入口页跳转失败」。
     </div>
 
-    <p class="tip">4 秒后自动跳转 · 建议收藏本页</p>
+    <p class="tip">1 秒后自动跳转 · 建议收藏本页</p>
   </div>
 
 <script>
-  // 依次探测候选域名，跳到第一个能通的（cpolar 重启会换域名，多写几个）
-  var CANDIDATES = [
-    "http://7194cc1b.r60.cpolar.top",
-    "http://4d56101e.r60.cpolar.top"
-  ];
-  var status = document.getElementById("status");
+  // 本页在 GitHub Pages 上是 https，隧道是 http：
+  // 浏览器会拦截 https → http 的 fetch（混合内容），所以这里只跳转、不探测。
+  var TARGET = "http://7194cc1b.r60.cpolar.top/";   // ← 换隧道只改这一行
   var statusText = document.getElementById("statusText");
-  var warn = document.getElementById("warn");
   var btn = document.getElementById("enterBtn");
-  var online = null;
-
-  function probe(base) {
-    return fetch(base + "/_stcore/health", { mode: "no-cors", cache: "no-store", signal: AbortSignal.timeout ? AbortSignal.timeout(3000) : undefined })
-      .then(function () { return base; })
-      .catch(function () { return null; });
-  }
-
-  function tryAll(index) {
-    if (index >= CANDIDATES.length) {
-      status.classList.add("off");
-      statusText.textContent = "服务器暂时连不上";
-      warn.style.display = "block";
-      btn.onclick = function (e) { e.preventDefault(); tryAll(0); };
-      return;
-    }
-    statusText.textContent = "正在检测服务器…";
-    probe(CANDIDATES[index]).then(function (ok) {
-      if (ok) {
-        online = ok;
-        statusText.textContent = "服务器在线，正在进入…";
-        btn.href = ok + "/";
-        setTimeout(function () { location.href = ok + "/"; }, 800);
-      } else {
-        tryAll(index + 1);
-      }
-    });
-  }
-
-  btn.onclick = function (e) {
-    e.preventDefault();
-    if (online) { location.href = online + "/"; } else { tryAll(0); }
-  };
-  tryAll(0);
+  btn.href = TARGET;
+  statusText.textContent = "正在进入…";
+  setTimeout(function () { location.href = TARGET; }, 1200);
 </script>
 </body>
 </html>
