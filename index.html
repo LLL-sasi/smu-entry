@@ -1,26 +1,95 @@
-<!doctype html
+<!doctype html>
 <html lang="zh-CN">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <title>南医大 AI 学习助手</title>
-<meta http-equiv="refresh" content="2; url=http://7194cc1b.r60.cpolar.top/">
+<meta name="theme-color" content="#1f6feb">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐋</text></svg>">
+<meta http-equiv="refresh" content="4; url=http://7194cc1b.r60.cpolar.top/">
 <style>
-  body{margin:0;min-height:100vh;display:flex;align-items:center;justify-content:center;
-       background:linear-gradient(135deg,#eef4ff,#f7fbff);font-family:-apple-system,"Segoe UI",sans-serif;color:#1f2328;padding:20px}
-  .card{background:#fff;border-radius:18px;padding:44px 34px;text-align:center;box-shadow:0 10px 36px rgba(0,0,0,.1);max-width:430px;width:100%}
-  h1{font-size:24px;margin:0 0 6px}
-  .btn{display:inline-block;margin:20px 0 12px;padding:13px 34px;border-radius:11px;background:#1f6feb;color:#fff;text-decoration:none;font-weight:600}
-  .tip{font-size:12px;color:#8b949e;line-height:1.8}
+  :root { --blue:#1f6feb; --ink:#1f2328; --muted:#6b7683; --line:#e6ecf3; }
+  * { box-sizing:border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:center; justify-content:center;
+    background:linear-gradient(135deg,#eef4ff,#f7fbff); color:var(--ink);
+    font-family:-apple-system,"Segoe UI","Microsoft YaHei",sans-serif; padding:20px;
+  }
+  .card {
+    background:#fff; border-radius:18px; padding:38px 30px; text-align:center;
+    box-shadow:0 10px 36px rgba(0,0,0,.10); max-width:440px; width:100%;
+  }
+  h1 { font-size:23px; margin:0 0 8px; letter-spacing:.3px; }
+  .sub { color:var(--muted); font-size:13px; margin:0 0 4px; }
+  .status {
+    display:inline-flex; align-items:center; gap:6px; font-size:12px;
+    padding:4px 10px; border-radius:99px; background:#e8f5e9; color:#1b5e20; margin:10px 0 2px;
+  }
+  .status.off { background:#fdecea; color:#8c1d18; }
+  .dot { width:7px; height:7px; border-radius:50%; background:currentColor; }
+  .btn {
+    display:block; margin:18px 0 10px; padding:14px 20px; border-radius:12px;
+    background:var(--blue); color:#fff; text-decoration:none; font-weight:600; font-size:16px;
+  }
+  .btn:active { transform:scale(.99); }
+  .steps { text-align:left; margin:18px 0 0; padding:0; list-style:none; font-size:13px; color:#39424e; }
+  .steps li { padding:9px 0; border-top:1px solid var(--line); line-height:1.6; }
+  .steps li:first-child { border-top:0; }
+  .steps b { color:var(--ink); }
+  .code { background:#f2f6fc; border-radius:6px; padding:1px 7px; font-weight:700; color:var(--blue); letter-spacing:1px; }
+  .tip { font-size:12px; color:var(--muted); line-height:1.9; margin:14px 0 0; }
+  .warn { display:none; margin:14px 0 0; padding:12px; border-radius:10px;
+          background:#fff8e6; color:#7a4b00; font-size:12.5px; line-height:1.8; text-align:left; }
 </style>
 </head>
 <body>
   <div class="card">
     <h1>🐋 南医大 AI 学习助手</h1>
-    <p>2 秒后自动跳转</p>
+    <p class="sub">课件 → 分级笔记 → 错题 → 复习</p>
+    <div class="status" id="status"><span class="dot"></span><span id="statusText">正在检测服务器…</span></div>
+
     <a class="btn" href="http://7194cc1b.r60.cpolar.top/">立即进入</a>
-    <p class="tip">邀请码：___2026LIN_______</p>
-    <p class="tip">收藏本页，每天从这里进</p>
+
+    <ul class="steps">
+      <li><b>① 注册</b>：用户名随便起，邀请码填 <span class="code">2026LIN</span></li>
+      <li><b>② 填 Key</b>：左侧「🔑 我的 Key」粘贴自己的 DeepSeek Key（10 元够一学期）</li>
+      <li><b>③ 加桌面</b>：浏览器菜单 → 添加到主屏幕，以后一点就进</li>
+    </ul>
+
+    <div class="warn" id="warn">
+      <b>打不开怎么办？</b><br>
+      说明服务当前没开（免费隧道会休眠，导员电脑也可能关机）。<br>
+      请稍后再试，或者告诉管理员「入口页跳转失败」。
+    </div>
+
+    <p class="tip">4 秒后自动跳转 · 建议收藏本页</p>
   </div>
+
+<script>
+  (function () {
+    var target = "http://7194cc1b.r60.cpolar.top/_stcore/health";
+    var status = document.getElementById("status");
+    var statusText = document.getElementById("statusText");
+    var warn = document.getElementById("warn");
+    var timer = setTimeout(function () {
+      status.classList.add("off");
+      statusText.textContent = "服务器暂时没响应";
+      warn.style.display = "block";
+    }, 3500);
+
+    fetch(target, { mode: "no-cors", cache: "no-store" })
+      .then(function () {
+        clearTimeout(timer);
+        statusText.textContent = "服务器在线，正在进入…";
+        setTimeout(function () { location.href = "http://7194cc1b.r60.cpolar.top/"; }, 900);
+      })
+      .catch(function () {
+        clearTimeout(timer);
+        status.classList.add("off");
+        statusText.textContent = "服务器暂时连不上";
+        warn.style.display = "block";
+      });
+  })();
+</script>
 </body>
 </html>
